@@ -3,7 +3,7 @@
 **`Desenvolvedor FullStack`**
 
 <h2 align="center">Olá! Sejam bem vindos ao meu Github!</h2>
-Me chamo Mike Costa, tenho 27 anos e sou natural de SP. Concluí o ensino médio no IFRS, com o curso técnico em informática. Atualmente, estou cursando Análise e Desenvolvimento de Sistemas na PUCRS. Sou apaixonada por tecnologia e , onde ensino a criar projetos web, e também através do Instagram, com o perfil chamado "[Dev em Dev](https://www.instagram.com/dev_em_dev/)".
+Me chamo Mike Costa, tenho 27 anos e sou natural de São Paulo. Ao longo da minha trajetória profissional, atuei em áreas como performance operacional, planejamento estratégico e análise de dados. No entanto, foi por meio dos projetos que gerenciei que descobri minha verdadeira paixão: a tecnologia. Atualmente, estou cursando Análise e Desenvolvimento de Sistemas com o objetivo de ingressar na área de programação e construir minha carreira como desenvolvedor.
 
 <p align="left">
  </a>
