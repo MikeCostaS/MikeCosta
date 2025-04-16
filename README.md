@@ -65,6 +65,21 @@ Me chamo Mike Costa, tenho 27 anos e sou natural de São Paulo. Ao longo da minh
     style="padding-right: 10px;" 
     src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/javascript/javascript-original.svg" 
 />
+ <img 
+  src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg" 
+  height="30" 
+  alt="mysql logo"  
+  />
+  <img 
+   src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg" 
+   height="30" 
+   alt="postgresql logo"  
+   />
+   <img 
+    src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/amazonwebservices/amazonwebservices-line-wordmark.svg" 
+    height="30" 
+    alt="amazonwebservices logo"  
+    />
 <img 
     align="left" 
     alt="Next.js" 
@@ -115,7 +130,7 @@ Me chamo Mike Costa, tenho 27 anos e sou natural de São Paulo. Ao longo da minh
   <img 
     align="left" 
     alt="GitHub Stats" 
-    height="200" 
+    height="150" 
     style="padding-right: 10px;" 
     src="https://github-readme-stats.vercel.app/api?username=MikeCostaS&show_icons=true&theme=tokyonight&include_all_commits=true&locale=pt-br" 
   />
@@ -123,7 +138,7 @@ Me chamo Mike Costa, tenho 27 anos e sou natural de São Paulo. Ao longo da minh
 <img 
       align="left" 
       alt="GitHub Stats" 
-      height="200" 
+      height="150" 
       src="https://github-readme-stats.vercel.app/api/top-langs/?username=MikeCostaS&theme=tokyonight&layout=compact&custom_title=Tecnologias&langs_count=9" 
   />
 
