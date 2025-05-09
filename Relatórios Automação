@@ -1,0 +1,63 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MAX_LINE 256
+
+// Função para processar um arquivo CSV
+void processarArquivo(const char *filename, double *soma, int *contagem) {
+    FILE *file = fopen(filename, "r");
+    if (!file) {
+        printf("Erro ao abrir o arquivo %s.\n", filename);
+        return;
+    }
+
+    char linha[MAX_LINE];
+    double valor;
+    char data[20], descricao[50];
+
+    // Ignorar o cabeçalho
+    fgets(linha, sizeof(linha), file);
+
+    while (fgets(linha, sizeof(linha), file)) {
+        if (sscanf(linha, "%[^,],%lf,%[^\n]", data, &valor, descricao) == 3) {
+            *soma += valor;
+            (*contagem)++;
+        }
+    }
+
+    fclose(file);
+}
+
+// Função para gerar o relatório consolidado
+void gerarRelatorio(double soma, int contagem) {
+    FILE *relatorio = fopen("relatorio_financeiro.csv", "w");
+    if (!relatorio) {
+        printf("Erro ao criar o relatório.\n");
+        return;
+    }
+
+    fprintf(relatorio, "Relatório Financeiro Consolidado\n");
+    fprintf(relatorio, "Total de Transações: %d\n", contagem);
+    fprintf(relatorio, "Soma dos Valores: %.2f\n", soma);
+    fprintf(relatorio, "Média por Transação: %.2f\n", (contagem > 0) ? soma / contagem : 0.0);
+
+    fclose(relatorio);
+    printf("Relatório gerado com sucesso: relatorio_financeiro.csv\n");
+}
+
+int main() {
+    double soma = 0.0;
+    int contagem = 0;
+
+    // Lista de arquivos de entrada (pode ser dinamicamente preenchida)
+    const char *arquivos[] = {"financeiro_jan.csv", "financeiro_fev.csv", "financeiro_mar.csv"};
+    int num_arquivos = sizeof(arquivos) / sizeof(arquivos[0]);
+
+    for (int i = 0; i < num_arquivos; i++) {
+        processarArquivo(arquivos[i], &soma, &contagem);
+    }
+
+    gerarRelatorio(soma, contagem);
+    return 0;
+}
