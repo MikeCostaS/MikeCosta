@@ -1,0 +1,74 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <curl/curl.h>
+
+// Callback para gravar a resposta da API
+size_t write_callback(void *ptr, size_t size, size_t nmemb, char *data) {
+    strcat(data, (char *)ptr);
+    return size * nmemb;
+}
+
+// Função para processar o pagamento
+void processarPagamento(const char *numero_cartao, const char *validade, 
+                        const char *cvv, double valor) {
+    CURL *curl;
+    CURLcode res;
+    char response[1024] = "";
+    char json_data[512];
+
+    // Monta os dados da transação em JSON
+    snprintf(json_data, sizeof(json_data),
+             "{\"card_number\": \"%s\", \"expiry_date\": \"%s\", \"cvv\": \"%s\", \"amount\": %.2f}",
+             numero_cartao, validade, cvv, valor);
+
+    // Inicializa o cURL
+    curl = curl_easy_init();
+    if (curl) {
+        struct curl_slist *headers = NULL;
+        headers = curl_slist_append(headers, "Content-Type: application/json");
+        headers = curl_slist_append(headers, "Authorization: Bearer SEU_TOKEN_API");
+
+        // Configurações da requisição
+        curl_easy_setopt(curl, CURLOPT_URL, "https://api.gatewaypagamento.com/v1/process");
+        curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+        curl_easy_setopt(curl, CURLOPT_POSTFIELDS, json_data);
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_callback);
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, response);
+
+        // Realiza a requisição POST
+        res = curl_easy_perform(curl);
+
+        // Verifica o resultado
+        if (res != CURLE_OK) {
+            fprintf(stderr, "Erro na requisição: %s\n", curl_easy_strerror(res));
+        } else {
+            printf("Resposta da API: %s\n", response);
+        }
+
+        // Limpeza
+        curl_easy_cleanup(curl);
+        curl_slist_free_all(headers);
+    }
+}
+
+int main() {
+    char numero_cartao[20];
+    char validade[6];
+    char cvv[4];
+    double valor;
+
+    // Entrada de dados do cartão
+    printf("Número do Cartão: ");
+    scanf("%19s", numero_cartao);
+    printf("Validade (MM/AA): ");
+    scanf("%5s", validade);
+    printf("CVV: ");
+    scanf("%3s", cvv);
+    printf("Valor da Transação: ");
+    scanf("%lf", &valor);
+
+    // Processa o pagamento
+    processarPagamento(numero_cartao, validade, cvv, valor);
+    return 0;
+}
