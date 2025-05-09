@@ -1,0 +1,54 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <curl/curl.h>
+
+// Função de callback para gravar a resposta da API
+size_t write_callback(void *ptr, size_t size, size_t nmemb, char *data) {
+    strcat(data, (char *)ptr);
+    return size * nmemb;
+}
+
+int main() {
+    CURL *curl;
+    CURLcode res;
+    char response[1024] = "";  // Buffer para armazenar a resposta da API
+
+    // URL da API de pagamento
+    const char *url = "https://api.pagamento.com/v1/transaction";
+
+    // Dados de pagamento em formato JSON
+    const char *json_data = "{\"amount\": 100.50, \"currency\": \"BRL\", \"card_number\": \"1234567890123456\", \"expiry_date\": \"12/25\", \"cvv\": \"123\"}";
+
+    // Inicializa o curl
+    curl = curl_easy_init();
+    if (curl) {
+        struct curl_slist *headers = NULL;
+
+        // Cabeçalhos da requisição
+        headers = curl_slist_append(headers, "Content-Type: application/json");
+        headers = curl_slist_append(headers, "Authorization: Bearer SEU_TOKEN_API");
+
+        // Configurações da requisição
+        curl_easy_setopt(curl, CURLOPT_URL, url);
+        curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+        curl_easy_setopt(curl, CURLOPT_POSTFIELDS, json_data);
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_callback);
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, response);
+
+        // Realiza a requisição POST
+        res = curl_easy_perform(curl);
+
+        // Verifica o resultado
+        if (res != CURLE_OK) {
+            fprintf(stderr, "Erro na requisição: %s\n", curl_easy_strerror(res));
+        } else {
+            printf("Resposta da API: %s\n", response);
+        }
+
+        // Limpa recursos
+        curl_easy_cleanup(curl);
+        curl_slist_free_all(headers);
+    }
+    return 0;
+}
