@@ -1,0 +1,73 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <pthread.h>
+#include <unistd.h>
+
+#define NUM_TRANSACOES 10
+
+// Estrutura para armazenar dados da transação
+typedef struct {
+    double valor;
+    char descricao[50];
+} Transacao;
+
+// Variáveis globais
+double saldo = 0.0;
+pthread_mutex_t mutex_saldo;
+
+// Função para processar a transação
+void* processar_transacao(void* arg) {
+    Transacao* transacao = (Transacao*)arg;
+
+    // Travar o mutex para acesso exclusivo ao saldo
+    pthread_mutex_lock(&mutex_saldo);
+
+    // Atualizar o saldo
+    saldo += transacao->valor;
+    printf("Processando: %s | Valor: %.2f | Saldo Atual: %.2f\n",
+           transacao->descricao, transacao->valor, saldo);
+
+    // Destravar o mutex
+    pthread_mutex_unlock(&mutex_saldo);
+    pthread_exit(NULL);
+}
+
+int main() {
+    pthread_t threads[NUM_TRANSACOES];
+    Transacao transacoes[NUM_TRANSACOES] = {
+        {100.0, "Depósito"},
+        {-50.0, "Compra Online"},
+        {200.0, "Transferência Recebida"},
+        {-30.0, "Pagamento de Conta"},
+        {150.0, "Bônus Salarial"},
+        {-20.0, "Assinatura de Serviço"},
+        {300.0, "Recebimento de Cliente"},
+        {-75.0, "Compra no Supermercado"},
+        {50.0, "Reembolso"},
+        {-40.0, "Pagamento de Multa"}
+    };
+
+    // Inicializar o mutex
+    pthread_mutex_init(&mutex_saldo, NULL);
+
+    // Criar threads para processar transações
+    for (int i = 0; i < NUM_TRANSACOES; i++) {
+        if (pthread_create(&threads[i], NULL, processar_transacao, (void*)&transacoes[i]) != 0) {
+            perror("Erro ao criar thread");
+            return 1;
+        }
+        usleep(100000); // Pequeno atraso para simular tempo real
+    }
+
+    // Aguardar todas as threads terminarem
+    for (int i = 0; i < NUM_TRANSACOES; i++) {
+        pthread_join(threads[i], NULL);
+    }
+
+    // Resultado final
+    printf("\nSaldo Final: %.2f\n", saldo);
+
+    // Destruir o mutex
+    pthread_mutex_destroy(&mutex_saldo);
+    return 0;
+}
