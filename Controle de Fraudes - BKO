@@ -1,0 +1,174 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <curl/curl.h>
+
+// Callback para gravar a resposta da API
+size_t write_callback(void *ptr, size_t size, size_t nmemb, char *data) {
+    strcat(data, (char *)ptr);
+    return size * nmemb;
+}
+
+// Função para processar o pagamento
+void processarPagamento(const char *numero_cartao, const char *validade, 
+                        const char *cvv, double valor) {
+    CURL *curl;
+    CURLcode res;
+    char response[1024] = "";
+    char json_data[512];
+
+    // Monta os dados da transação em JSON
+    snprintf(json_data, sizeof(json_data),
+             "{\"card_number\": \"%s\", \"expiry_date\": \"%s\", \"cvv\": \"%s\", \"amount\": %.2f}",
+             numero_cartao, validade, cvv, valor);
+
+    // Inicializa o cURL
+    curl = curl_easy_init();
+    if (curl) {
+        struct curl_slist *headers = NULL;
+        headers = curl_slist_append(headers, "Content-Type: application/json");
+        headers = curl_slist_append(headers, "Authorization: Bearer SEU_TOKEN_API");
+
+        // Configurações da requisição
+        curl_easy_setopt(curl, CURLOPT_URL, "https://api.gatewaypagamento.com/v1/process");
+        curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+        curl_easy_setopt(curl, CURLOPT_POSTFIELDS, json_data);
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_callback);
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, response);
+
+        // Realiza a requisição POST
+        res = curl_easy_perform(curl);
+
+        // Verifica o resultado
+        if (res != CURLE_OK) {
+            fprintf(stderr, "Erro na requisição: %s\n", curl_easy_strerror(res));
+        } else {
+            printf("Resposta da API: %s\n", response);
+        }
+
+        // Limpeza
+        curl_easy_cleanup(curl);
+        curl_slist_free_all(headers);
+    }
+}
+
+int main() {
+    char numero_cartao[20];
+    char validade[6];
+    char cvv[4];
+    double valor;
+
+    // Entrada de dados do cartão
+    printf("Número do Cartão: ");
+    scanf("%19s", numero_cartao);
+    printf("Validade (MM/AA): ");
+    scanf("%5s", validade);
+    printf("CVV: ");
+    scanf("%3s", cvv);
+    printf("Valor da Transação: ");
+    scanf("%lf", &valor);
+
+    // Processa o pagamento
+    processarPagamento(numero_cartao, validade, cvv, valor);
+    return 0;
+}
+[16:21, 5/9/2025] 🎩Mike Costa🎧: #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define LIMITE_VALOR 3000.0
+#define LIMITE_TRANSACOES 3
+#define LIMITE_LOCAL 2
+#define MAX_TRANSACOES 100
+#define MAX_LINHA 256
+
+// Estrutura para armazenar a transação
+typedef struct {
+    char cartao[20];
+    double valor;
+    char local[50];
+    char dataHora[20];
+} Transacao;
+
+// Função para carregar transações do arquivo CSV
+int carregarTransacoes(const char *arquivo, Transacao transacoes[]) {
+    FILE *file = fopen(arquivo, "r");
+    if (!file) {
+        perror("Erro ao abrir o arquivo");
+        return 0;
+    }
+
+    char linha[MAX_LINHA];
+    int i = 0;
+
+    // Ignorar o cabeçalho
+    fgets(linha, sizeof(linha), file);
+
+    while (fgets(linha, sizeof(linha), file) && i < MAX_TRANSACOES) {
+        sscanf(linha, "%[^,],%lf,%[^,],%[^\n]",
+               transacoes[i].cartao,
+               &transacoes[i].valor,
+               transacoes[i].local,
+               transacoes[i].dataHora);
+        i++;
+    }
+
+    fclose(file);
+    return i;
+}
+
+// Função para detectar fraudes
+void detectarFraude(Transacao transacoes[], int total) {
+    printf("Transações Suspeitas:\n");
+
+    for (int i = 0; i < total; i++) {
+        int suspeito = 0;
+
+        // Verificação 1: Valor muito alto
+        if (transacoes[i].valor > LIMITE_VALOR) {
+            printf("Transação Suspeita: Valor Alto - Cartão: %s | Valor: %.2f\n",
+                   transacoes[i].cartao, transacoes[i].valor);
+            suspeito = 1;
+        }
+
+        // Verificação 2: Múltiplas transações seguidas do mesmo cartão
+        int contagem = 1;
+        for (int j = i + 1; j < total; j++) {
+            if (strcmp(transacoes[i].cartao, transacoes[j].cartao) == 0) {
+                contagem++;
+                if (contagem > LIMITE_TRANSACOES) {
+                    printf("Transação Suspeita: Múltiplas Transações - Cartão: %s\n", transacoes[i].cartao);
+                    suspeito = 1;
+                    break;
+                }
+            }
+        }
+
+        // Verificação 3: Mudança geográfica abrupta
+        if (i > 0 && strcmp(transacoes[i].cartao, transacoes[i - 1].cartao) == 0) {
+            if (strcmp(transacoes[i].local, transacoes[i - 1].local) != 0) {
+                printf("Transação Suspeita: Local Inconsistente - Cartão: %s | De: %s Para: %s\n",
+                       transacoes[i].cartao, transacoes[i - 1].local, transacoes[i].local);
+                suspeito = 1;
+            }
+        }
+
+        if (!suspeito) {
+            printf("Transação Aprovada: Cartão: %s | Valor: %.2f\n",
+                   transacoes[i].cartao, transacoes[i].valor);
+        }
+    }
+}
+
+int main() {
+    Transacao transacoes[MAX_TRANSACOES];
+    int total = carregarTransacoes("transacoes.csv", transacoes);
+
+    if (total > 0) {
+        detectarFraude(transacoes, total);
+    } else {
+        printf("Nenhuma transação carregada.\n");
+    }
+
+    return 0;
+}
