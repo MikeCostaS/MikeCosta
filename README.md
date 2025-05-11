@@ -125,8 +125,8 @@ Me chamo Mike Costa, tenho 27 anos e sou natural de São Paulo. Ao longo da minh
 <br/>
 
 ### 📈 Estatísticas
-
-<p> display: inline-block
+display: inline-block
+<p> 
   <img 
     align="left" 
     alt="GitHub Stats" 
