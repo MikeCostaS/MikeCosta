@@ -125,7 +125,7 @@ Me chamo Mike Costa, tenho 27 anos e sou natural de São Paulo. Ao longo da minh
 <br/>
 
 ### 📈 Estatísticas
-display: inline-block
+
 <p> 
   <img 
     align="left" 
