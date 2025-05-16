@@ -1,0 +1,32 @@
+const express = require('express');
+const http = require('http');
+const socketIo = require('socket.io');
+const path = require('path');
+
+const app = express();
+const server = http.createServer(app);
+const io = socketIo(server);
+
+// Servir arquivos estáticos
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Evento de conexão dos clientes
+io.on('connection', (socket) => {
+    console.log('🟢 Novo usuário conectado');
+
+    // Quando alguém envia uma mensagem
+    socket.on('chat message', (msg) => {
+        console.log('💬 Mensagem recebida:', msg);
+        io.emit('chat message', msg); // envia para todos os conectados
+    });
+
+    socket.on('disconnect', () => {
+        console.log('🔴 Usuário desconectado');
+    });
+});
+
+// Iniciar o servidor
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, () => {
+    console.log(`🚀 Servidor rodando em http://localhost:${PORT}`);
+});
