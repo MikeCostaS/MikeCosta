@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Chat Marisa</title>
+  <style>
+    body { font-family: sans-serif; background: #fff5f7; }
+    #chat, #login { max-width: 600px; margin: 50px auto; padding: 20px; border-radius: 10px; background: white; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    #messages { list-style: none; padding: 0; max-height: 300px; overflow-y: auto; margin-bottom: 10px; }
+    #messages li { padding: 8px; margin-bottom: 5px; border-radius: 5px; background: #fce4ec; }
+    #form { display: flex; gap: 10px; }
+    #input { flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
+    #send, #enter { background: #e1005a; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; }
+    #login { text-align: center; }
+  </style>
+</head>
+<body>
+  <!-- Tela de login -->
+  <div id="login">
+    <h2>🛍️ Bem-vindo ao Chat Marisa</h2>
+    <input id="username" placeholder="Digite seu nome..." />
+    <button id="enter">Entrar</button>
+  </div>
+
+  <!-- Tela de chat -->
+  <div id="chat" style="display:none;">
+    <h3>Atendimento Marisa</h3>
+    <ul id="messages"></ul>
+    <form id="form">
+      <input id="input" autocomplete="off" placeholder="Digite sua mensagem..." />
+      <button id="send">Enviar</button>
+    </form>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+    let username = '';
+
+    const login = document.getElementById('login');
+    const chat = document.getElementById('chat');
+    const enterBtn = document.getElementById('enter');
+    const usernameInput = document.getElementById('username');
+    const form = document.getElementById('form');
+    const input = document.getElementById('input');
+    const messages = document.getElementById('messages');
+
+    enterBtn.addEventListener('click', () => {
+      const name = usernameInput.value.trim();
+      if (name) {
+        username = name;
+        login.style.display = 'none';
+        chat.style.display = 'block';
+        socket.emit('join', username);
+      }
+    });
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      if (input.value.trim()) {
+        socket.emit('chat message', { name: username, message: input.value });
+        input.value = '';
+      }
+    });
+
+    socket.on('chat message', (data) => {
+      const item = document.createElement('li');
+      item.innerHTML = `<strong>${data.name}:</strong> ${data.message}`;
+      messages.appendChild(item);
+      messages.scrollTop = messages.scrollHeight;
+    });
+  </script>
+</body>
+</html>
