@@ -1,36 +1,49 @@
 #include <stdio.h>
 
-int main(){
-
-    char cavalo = 0;
-    char movimentoLateral = 0;
-    //VARIAVEL TORRE DEFINIDA
-    int torre, rainha = 0, bispo = 0;
-    //Mover a torre 5 casas para a direita
-    for ( torre = 0; torre < 5; torre++)
+void moverTorre(int casas){
+    if(casas > 0)
+    {   printf("Direita \n");
+        moverTorre(casas - 1);
+    }
+}
+    
+        
+void moverRainha(int movimentoRainha){
+    
+    if (movimentoRainha > 0)
     {
-        printf("Direita\n");// imprime a direcao do movimento
+        printf("Esquerda \n");
+        moverRainha(movimentoRainha - 1);
     }
     
-    //mover a rainha 8 casas
-while (rainha < 8)
-{
-    printf("Esqueda\n");// imprime o movimento da rainha
-     rainha++;
 }
-   
-do//movimenta o bispo
-{   printf("Cima, Direita\n");
-    bispo++;
     
-} while (bispo < 5);// imprime a direcao do movimento
- 
-//movimentação do cavalo com loop aninhado
-for(cavalo = 0; cavalo < 2; cavalo++ )
-{
-    printf("Baixo, baixo\n");
 
-    for (movimentoLateral = 0; movimentoLateral < 1; movimentoLateral++)
+int main(){
+
+    //VARIAVEL TORRE DEFINIDA
+    int torre, rainha = 0, bispo = 0, cavalo = 0;
+
+    //Mover a torre 5 casas para a direita
+    moverTorre(5);
+    
+    //mover a rainha 8 casas para esquerda
+    moverRainha(8);
+
+   //movimenta o bispo 5 casas para direita cima
+for(bispo < 5; bispo++){
+    printf("Cima\n");
+    for (int movimentoBispo = 0; movimentoBispo < 5; movimentoBispo++){
+    printf("Direita \n");
+    }
+} 
+
+//movimentação do cavalo com loop aninhado mover para cima e direita
+for(int cavalo = 0, movimentoCav = 1; cavalo < movimentoCav ; cavalo++ )
+{
+    printf("Cima, Cima\n");
+
+    for (int movimentoLateral = 0; movimentoLateral < 1; movimentoLateral++)
     {
         printf("Esquerda\n");
     }
