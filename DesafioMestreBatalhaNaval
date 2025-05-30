@@ -1,0 +1,87 @@
+#include <stdio.h>
+
+// Função para calcular valor absoluto
+int absoluto(int x) {
+    return (x < 0) ? -x : x;
+}
+
+// Função para imprimir o tabuleiro final
+void imprimirTabuleiro(int tabuleiro[10][10]) {
+    char letras[10] = {'A','B','C','D','E','F','G','H','I','J'};
+    printf("   ");
+    for (int c = 0; c < 10; c++) {
+        printf("%2d", c + 1);
+    }
+    printf("\n");
+
+    for (int l = 0; l < 10; l++) {
+        printf("%c ", letras[l]);
+        for (int c = 0; c < 10; c++) {
+            printf("%2d", tabuleiro[l][c]);
+        }
+        printf("\n");
+    }
+}
+
+// Função para aplicar a matriz da habilidade no tabuleiro
+void aplicarHabilidade(int tabuleiro[10][10], int origemX, int origemY, int habilidade[5][5]) {
+    for (int i = 0; i < 5; i++) {
+        for (int j = 0; j < 5; j++) {
+            int posX = origemX - 2 + i;
+            int posY = origemY - 2 + j;
+            if (posX >= 0 && posX < 10 && posY >= 0 && posY < 10) {
+                if (habilidade[i][j] == 1 && tabuleiro[posX][posY] == 0) {
+                    tabuleiro[posX][posY] = 5;
+                }
+            }
+        }
+    }
+}
+
+int main() {
+    int tabuleiro[10][10] = {0};  // Inicializa todo com 0 (água)
+
+    // Adiciona alguns navios fixos (3)
+    tabuleiro[2][2] = 3;
+    tabuleiro[3][1] = 3;
+    tabuleiro[3][2] = 3;
+    tabuleiro[3][3] = 3;
+    tabuleiro[4][0] = 3;
+    tabuleiro[4][1] = 3;
+    tabuleiro[4][2] = 3;
+    tabuleiro[4][3] = 3;
+    tabuleiro[4][4] = 3;
+
+    // Cria as matrizes das habilidades 5x5
+
+    // Cone
+    int cone[5][5] = {0};
+    for (int i = 0; i < 5; i++)
+        for (int j = 0; j < 5; j++)
+            if (j >= 2 - i && j <= 2 + i)
+                cone[i][j] = 1;
+
+    // Cruz
+    int cruz[5][5] = {0};
+    for (int i = 0; i < 5; i++)
+        for (int j = 0; j < 5; j++)
+            if (i == 2 || j == 2)
+                cruz[i][j] = 1;
+
+    // Octaedro
+    int octaedro[5][5] = {0};
+    for (int i = 0; i < 5; i++)
+        for (int j = 0; j < 5; j++)
+            if (absoluto(i - 2) + absoluto(j - 2) <= 2)
+                octaedro[i][j] = 1;
+
+    // Aplica habilidades em pontos diferentes do tabuleiro
+    aplicarHabilidade(tabuleiro, 3, 2, cone);      // Cone perto da linha 3, coluna 2
+    aplicarHabilidade(tabuleiro, 2, 7, cruz);      // Cruz perto da linha 2, coluna 7
+    aplicarHabilidade(tabuleiro, 7, 7, octaedro);  // Octaedro perto da linha 7, coluna 7
+
+    // Imprime o tabuleiro final com as três habilidades aplicadas
+    imprimirTabuleiro(tabuleiro);
+
+    return 0;
+}
