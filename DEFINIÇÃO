@@ -1,0 +1,30 @@
+<!--Tabela com Cabeçalho e Rodapé-->
+<!DOCTYPE html>
+<body>
+    <h2>Tabela com cabecalho e rodape</h2>
+    <table width= "100%" border="1">
+        <thead>
+            <tr>
+                <th>Mes</th>
+                <th>Horas/Aula</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Junho</td>
+                <td>40</td>
+            </tr>
+            <tr>
+                <td>Julho</td>
+                <td>30</td>
+            </tr>
+        </tbody>
+        <tfoot>
+            <tr>
+                <th>Total</th>
+                <th>70</th>
+            </tr>
+        </tfoot>
+    </table>
+
+</body>
